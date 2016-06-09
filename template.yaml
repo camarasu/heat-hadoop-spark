@@ -1,0 +1,123 @@
+heat_template_version: 2015-04-30
+description: "Sets up a hadoop-spark cluster"
+
+parameters:
+  #master-name:
+  #  type: string
+  #  label: Hostname of the master node
+  #  default: master
+  #  hidden: true
+  #  #TODO: add constraints to verify that the host 
+  #  #name is a valid hostname
+  #slave-base-name:
+  #  type: string
+  #  label: Base hostname for the slaves
+  #  default: slave-
+  #  #TODO: add constraints to verify that the host 
+  #  #name is a valid hostname
+  #  hidden: true
+  num-slaves:
+    type: number
+    label: Number of slave nodes
+    description: Number of slave nodes for your cluster
+    default: 1
+  master-image:
+    type: string
+    label: Master Node Image
+    description: ID or name of the image to use for the master node
+    constraints:
+      - custom_constraint: glance.image
+    default: ubuntu-server-14.04-amd64
+  master-flavor:
+    type: string
+    label: Master Node Flavor
+    description: Hardware flavor to be used for the master node
+    constraints:
+      - custom_constraint: nova.flavor
+    default: c1-7.5gb-30
+  slave-image:
+    type: string
+    label: Slave Node Image
+    description: ID or name of the image to use for the slave nodes
+    constraints:
+      - custom_constraint: glance.image
+    default: ubuntu-server-14.04-amd64
+  slave-flavor:
+    type: string
+    label: Slave Node Flavor
+    description: Hardware flavor to be used for the slave nodes
+    constraints:
+      - custom_constraint: nova.flavor
+    default: c1-7.5gb-30
+  key:
+    type: string
+    label: Key-pair name
+    description: Name of key-pair to be used for master and slave nodes
+    default: thekey
+    constraints:
+      - custom_constraint: nova.keypair
+  private_network:
+    type: string
+    label: Private network name or ID
+    description: Network to attach instance to.
+    constraints:
+      - custom_constraint: neutron.network
+  public_network:
+    type: string
+    description: Network pool to use for obtaining public IP
+    label: Public Network
+    default: VLAN3337
+resources:
+  master:
+    type: OS::Nova::Server
+    properties:
+      flavor: {get_param: master-flavor}
+      image: {get_param: master-image}
+      key_name: {get_param: key}
+      name: master
+      networks:
+        - port: {get_resource: hs-master_port}
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          template: 
+            get_file: ./master.yaml
+          params:
+            MASTERNAME:{get_param: master-name}
+            SLAVENAMEBASE:{get_param: slave-base-name}
+            NUMSLAVES:{get_param: num-slaves}
+  hs-master_port:
+    type: OS::Neutron::Port
+    properties:
+      network: {get_param: private_network}
+      security_groups: [{get_resource: hs-ssh}]
+  hs-ssh:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      name: hs-ssh
+      rules:
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 22
+          port_range_max: 22
+  hs-master_floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      port_id: {get_resource: hs-master_port}
+      floating_network: {get_param: public_network}
+  slave_group:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: 2
+      resource_def:
+        type: OS::Nova::Server
+        properties:
+          name: slave-%index%
+          flavor: {get_param: slave-flavor}
+          image: {get_param: slave-image}
+          key_name: {get_param: key}
+          networks:
+            - network: {get_param: private_network}
+          user_data_format: RAW
+          user_data:
+            get_file: ./slave.yaml
