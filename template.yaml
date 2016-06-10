@@ -2,20 +2,6 @@ heat_template_version: 2015-04-30
 description: "Sets up a hadoop-spark cluster"
 
 parameters:
-  #master-name:
-  #  type: string
-  #  label: Hostname of the master node
-  #  default: master
-  #  hidden: true
-  #  #TODO: add constraints to verify that the host 
-  #  #name is a valid hostname
-  #slave-base-name:
-  #  type: string
-  #  label: Base hostname for the slaves
-  #  default: slave-
-  #  #TODO: add constraints to verify that the host 
-  #  #name is a valid hostname
-  #  hidden: true
   num-slaves:
     type: number
     label: Number of slave nodes
@@ -284,7 +270,7 @@ resources:
     type: OS::Neutron::Port
     properties:
       network: {get_param: private_network}
-      security_groups: [{get_resource: hs-ssh},default]
+      security_groups: [{get_resource: hs-ssh},{get_resource: hs-name-node},{get_resource: hs-yarn},default]
   hs-ssh:
     type: OS::Neutron::SecurityGroup
     properties:
@@ -294,6 +280,24 @@ resources:
           protocol: tcp
           port_range_min: 22
           port_range_max: 22
+  hs-name-node:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      name: hs-name-node
+      rules:
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 50070
+          port_range_max: 50070
+  hs-yarn:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      name: hs-name-node
+      rules:
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 8088
+          port_range_max: 8088
   hs-master_floating_ip:
     type: OS::Neutron::FloatingIP
     properties:
@@ -346,4 +350,21 @@ resources:
                  - bash /tmp/bootstrap-minion.sh
               params:
                 IPTOREPLACE: { get_attr: [hs-master, first_address] }
-                #{get_attr: [hs-master, networks, {get_param: private_network}, 0]}
+outputs:
+  public_ip:
+    description: Floating IP address of hs-master in public network, can be used to ssh into master node
+    value: { get_attr: [ hs-master_floating_ip, floating_ip_address ] }
+  node_info_url:
+    description: Link to hdfs node information
+    value:
+      str_replace:
+        template: http://<hostip>:50070
+        params:
+          <hostip>: { get_attr: [ hs-master_floating_ip, floating_ip_address ] }
+  yarn_url:
+    description: Link to yarn job page
+    value:
+      str_replace:
+        template: http://<hostip>:8088
+        params:
+          <hostip>: { get_attr: [ hs-master_floating_ip, floating_ip_address ] }
