@@ -251,6 +251,11 @@ resources:
                         network.ip_addrs: []
                         grains.items: []
                 path: /etc/salt/minion.d/mine_functions.conf
+              - content: |
+                  #!/bin/bash
+                  wc_notify --data-binary '{"status": "SUCCESS", "reason": "master server CI done"}'
+                path: /tmp/finished.sh
+                permissions: "0755"
             runcmd:
               - bash /tmp/bootstrap-master.sh
               - bash /tmp/bootstrap-minion.sh
@@ -262,10 +267,12 @@ resources:
               - cd /srv/salt/formulas/hadoop-formula/hadoop/files;./generate_keypairs.sh
               - /tmp/salt-init/salt-init.py MASTERNAME SLAVENAMEBASE NUMSLAVES
               - sudo -H -u spark bash -c "/usr/lib/spark/sbin/start-all.sh"
+              - bash /tmp/finished.sh
           params:
             MASTERNAME: hs-master
             SLAVENAMEBASE: hs-slave-
             NUMSLAVES: {get_param: num-slaves}
+            wc_notify: {get_attr: ['master_wait_handle','curl_cli']}
   hs-master_port:
     type: OS::Neutron::Port
     properties:
@@ -346,10 +353,33 @@ resources:
                             network.ip_addrs: []
                             grains.items: []
                     path: /etc/salt/minion.d/mine_functions.conf
+                  - content: |
+                      #!/bin/bash
+                      wc_notify --data-binary '{"status": "SUCCESS", "reason": "Slave CI done"}'
+                    path: /tmp/finished.sh
+                    permissions: "0755"
                 runcmd: 
                  - bash /tmp/bootstrap-minion.sh
+                 - bash /tmp/finished.sh
               params:
                 IPTOREPLACE: { get_attr: [hs-master, first_address] }
+                wc_notify: {get_attr: ['slave_group_wait_handle','curl_cli']}
+  master_wait_handle:
+    type: OS::Heat::WaitConditionHandle
+  slave_group_wait_handle:
+    type: OS::Heat::WaitConditionHandle
+  master_wait_condition:
+    type: OS::Heat::WaitCondition
+    properties:
+      handle: {get_resource: master_wait_handle}
+      count: 1
+      timeout: 1200
+  slave_group_wait_condition:
+    type: OS::Heat::WaitCondition
+    properties:
+      handle: {get_resource: slave_group_wait_handle}
+      count: {get_param: num-slaves}
+      timeout: 1200
 outputs:
   public_ip:
     description: Floating IP address of hs-master in public network, can be used to ssh into master node
