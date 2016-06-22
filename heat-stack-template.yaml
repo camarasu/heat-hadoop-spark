@@ -66,8 +66,7 @@ resources:
       user_data_format: RAW
       user_data:
         str_replace:
-          template: 
-            get_file: https://raw.githubusercontent.com/cgeroux/heat-hadoop-spark/file_inclusions/ci-master.yaml
+          template: {get_file: https://raw.githubusercontent.com/cgeroux/heat-hadoop-spark/file_inclusions/ci-master.yaml}
           params:
             MASTERNAME: hs-master
             SLAVENAMEBASE: hs-slave-
@@ -126,8 +125,7 @@ resources:
           user_data_format: RAW
           user_data:
             str_replace:
-              template: 
-                get_file: https://raw.githubusercontent.com/cgeroux/heat-hadoop-spark/file_inclusions/ci-slave.yaml
+              template: {get_file: https://raw.githubusercontent.com/cgeroux/heat-hadoop-spark/file_inclusions/ci-slave.yaml}
               params:
                 IPTOREPLACE: { get_attr: [hs-master, first_address] }
                 wc_notify: {get_attr: ['slave_group_wait_handle','curl_cli']}
