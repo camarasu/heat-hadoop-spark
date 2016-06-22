@@ -1,5 +1,6 @@
 heat_template_version: 2015-04-30
-description: "Sets up a hadoop-spark cluster"
+
+description: Sets up a hadoop-spark cluster
 
 parameters:
   num-slaves:
