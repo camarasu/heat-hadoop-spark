@@ -24,5 +24,11 @@ write_files:
             network.ip_addrs: []
             grains.items: []
     path: /etc/salt/minion.d/mine_functions.conf
+  - content: |
+      #!/bin/bash
+      wc_notify --data-binary '{"status": "SUCCESS", "reason": "Slave CI done"}'
+    path: /tmp/finished.sh
+    permissions: "0755"
 runcmd: 
  - bash /tmp/bootstrap-minion.sh
+ - bash /tmp/finished.sh

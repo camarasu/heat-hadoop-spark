@@ -182,6 +182,11 @@ write_files:
             network.ip_addrs: []
             grains.items: []
     path: /etc/salt/minion.d/mine_functions.conf
+  - content: |
+      #!/bin/bash
+      wc_notify --data-binary '{"status": "SUCCESS", "reason": "master server CI done"}'
+    path: /tmp/finished.sh
+    permissions: "0755"
 runcmd:
   - bash /tmp/bootstrap-master.sh
   - bash /tmp/bootstrap-minion.sh
@@ -193,3 +198,4 @@ runcmd:
   - cd /srv/salt/formulas/hadoop-formula/hadoop/files;./generate_keypairs.sh
   - /tmp/salt-init/salt-init.py MASTERNAME SLAVENAMEBASE NUMSLAVES
   - sudo -H -u spark bash -c "/usr/lib/spark/sbin/start-all.sh"
+  - bash /tmp/finished.sh
