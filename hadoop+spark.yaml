@@ -384,10 +384,12 @@ resources:
       timeout: 1200
 outputs:
   public_ip:
+    name: public IP
     description: Floating IP address of hs-master in public network, can be used to ssh into master node
     value: { get_attr: [ hs-master_floating_ip, floating_ip_address ] }
   node_info_url:
-    description: Link to hdfs node information
+    description: Link to hdfs node information page
+    name: node information URL
     value:
       str_replace:
         template: http://<hostip>:50070
@@ -395,6 +397,7 @@ outputs:
           <hostip>: { get_attr: [ hs-master_floating_ip, floating_ip_address ] }
   yarn_url:
     description: Link to yarn job page
+    name: Yarn URL
     value:
       str_replace:
         template: http://<hostip>:8088
