@@ -265,6 +265,7 @@ resources:
               - git clone https://github.com/cgeroux/sun-java-formula.git /srv/salt/formulas/sun-java-formula
               - git clone -b heat-compatible https://github.com/cgeroux/init-salt.git /tmp/salt-init
               - sudo service salt-master restart
+              - sudo service salt-minion restart
               - cd /srv/salt/formulas/hadoop-formula/hadoop/files;./generate_keypairs.sh
               - /tmp/salt-init/salt-init.py MASTERNAME SLAVENAMEBASE NUMSLAVES
               - sudo -H -u spark bash -c "/usr/lib/spark/sbin/start-all.sh"
