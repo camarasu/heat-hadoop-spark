@@ -14,6 +14,7 @@ parameters:
     description: ID or name of the image to use for the master node
     constraints:
       - custom_constraint: glance.image
+      - allowed_pattern: "*ubuntu*"
     default: ubuntu-server-14.04-amd64
   master-flavor:
     type: string
