@@ -301,7 +301,7 @@ resources:
   hs-yarn:
     type: OS::Neutron::SecurityGroup
     properties:
-      name: hs-name-node
+      name: hs-yarn
       rules:
         - remote_ip_prefix: 0.0.0.0/0
           protocol: tcp
