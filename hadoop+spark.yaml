@@ -269,6 +269,7 @@ resources:
               - cd /srv/salt/formulas/hadoop-formula/hadoop/files;./generate_keypairs.sh
               - /tmp/salt-init/salt-init.py MASTERNAME SLAVENAMEBASE NUMSLAVES
               - sudo -H -u spark bash -c "/usr/lib/spark/sbin/start-all.sh"
+              - sudo -H -u ubuntu bash -c 'git clone https://github.com/cgeroux/big-data-examples.git $HOME/big-data-examples'
               - bash /tmp/finished.sh
           params:
             MASTERNAME: hs-master
