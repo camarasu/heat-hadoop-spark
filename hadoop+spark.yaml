@@ -284,30 +284,20 @@ resources:
     type: OS::Neutron::Port
     properties:
       network: {get_param: private_network}
-      security_groups: [{get_resource: hs-ssh},{get_resource: hs-name-node},{get_resource: hs-yarn},default]
-  hs-ssh:
+      security_groups: [{get_resource: hs-security},default]
+  hs-security:
     type: OS::Neutron::SecurityGroup
     properties:
-      name: hs-ssh
+      name: hs-security
       rules:
         - remote_ip_prefix: 0.0.0.0/0
           protocol: tcp
           port_range_min: 22
           port_range_max: 22
-  hs-name-node:
-    type: OS::Neutron::SecurityGroup
-    properties:
-      name: hs-name-node
-      rules:
         - remote_ip_prefix: 0.0.0.0/0
           protocol: tcp
           port_range_min: 50070
           port_range_max: 50070
-  hs-yarn:
-    type: OS::Neutron::SecurityGroup
-    properties:
-      name: hs-yarn
-      rules:
         - remote_ip_prefix: 0.0.0.0/0
           protocol: tcp
           port_range_min: 8088
