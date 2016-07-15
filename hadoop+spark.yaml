@@ -51,9 +51,13 @@ parameters:
       - custom_constraint: neutron.network
   public_network:
     type: string
-    description: Network pool to use for obtaining public IP
+    description: Network to use for obtaining public IP (VLAN3337 for west-cloud, net04_ext for east-cloud)
     label: Public Network
     default: VLAN3337
+    constraints:
+      - allowed_values:
+        - VLAN3337
+        - net04_ext
 resources:
   hs-master:
     type: OS::Nova::Server
