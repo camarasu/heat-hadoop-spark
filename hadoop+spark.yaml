@@ -249,6 +249,8 @@ resources:
                           value: '*'
                         yarn.scheduler.capacity.node-locality-delay:
                           value: -1
+                        yarn.log-aggregation-enable:
+                          value: 1
                 path: /srv/pillar/hadoop.sls
               - content: |
                     mine_functions:
