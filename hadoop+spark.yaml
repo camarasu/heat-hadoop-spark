@@ -212,6 +212,8 @@ resources:
                           value: org.apache.hadoop.mapred.ShuffleHandler
                         yarn.resourcemanager.scheduler.class:
                           value: org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.CapacityScheduler
+                        yarn.log-aggregation-enable:
+                          value: True
                       capacity-scheduler:
                         yarn.scheduler.capacity.maximum-applications:
                           value: 10000
@@ -249,8 +251,6 @@ resources:
                           value: '*'
                         yarn.scheduler.capacity.node-locality-delay:
                           value: -1
-                        yarn.log-aggregation-enable:
-                          value: 1
                 path: /srv/pillar/hadoop.sls
               - content: |
                     mine_functions:
