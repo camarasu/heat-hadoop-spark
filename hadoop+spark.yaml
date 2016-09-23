@@ -264,6 +264,7 @@ resources:
                 path: /tmp/finished.sh
                 permissions: "0755"
             runcmd:
+              - bash sed -i '/force_color_prompt=yes/s/^#//g' /home/ubuntu/.bashrc
               - bash /tmp/bootstrap-master.sh
               - bash /tmp/bootstrap-minion.sh
               - git clone https://github.com/cgeroux/hadoop-formula.git /srv/salt/formulas/hadoop-formula
@@ -358,6 +359,7 @@ resources:
                     path: /tmp/finished.sh
                     permissions: "0755"
                 runcmd: 
+                 - bash sed -i '/force_color_prompt=yes/s/^#//g' /home/ubuntu/.bashrc
                  - bash /tmp/bootstrap-minion.sh
                  - bash /tmp/finished.sh
               params:
