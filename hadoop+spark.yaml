@@ -59,6 +59,11 @@ parameters:
         - VLAN3337
         - net04_ext
 resources:
+  hs-server-group:
+    type: OS::Nova::ServerGroup
+    properties:
+      name: hs-different-nodes
+      policies: anti-affinity
   hs-master:
     type: OS::Nova::Server
     properties:
