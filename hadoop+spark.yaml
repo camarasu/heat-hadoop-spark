@@ -63,7 +63,8 @@ resources:
     type: OS::Nova::ServerGroup
     properties:
       name: hs-different-nodes
-      policies: ["anti-affinity"]
+      policies:
+        - anti-affinity
   hs-master:
     type: OS::Nova::Server
     properties:
