@@ -71,6 +71,7 @@ resources:
       image: {get_param: master-image}
       key_name: {get_param: key}
       name: hs-master
+      scheduler_hints: {'group': {get_resource: hs-server-group}}
       networks:
         - port: {get_resource: hs-master_port}
       user_data_format: RAW
@@ -326,6 +327,7 @@ resources:
           flavor: {get_param: slave-flavor}
           image: {get_param: slave-image}
           key_name: {get_param: key}
+          scheduler_hints: {'group': {get_resource: hs-server-group}}
           networks: 
             - network: {get_param: private_network}
           user_data_format: RAW
