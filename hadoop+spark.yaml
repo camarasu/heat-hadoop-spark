@@ -134,6 +134,10 @@ resources:
                       - hadoop.mapred
                       - hadoop.yarn
                       - hadoop.spark
+                      - sysstat
+                    'G@roles:hadoop_master':
+                      - match: compound
+                      - python-matplotlib
                 path: /srv/salt/top.sls
               - content: |
                   base:
@@ -269,6 +273,16 @@ resources:
                   wc_notify --data-binary '{"status": "SUCCESS", "reason": "master server CI done"}'
                 path: /tmp/finished.sh
                 permissions: "0755"
+              - content: |
+                  python-matplotlib:
+                    pkg:
+                    - installed
+                path: /srv/salt/python-matplotlib.sls
+              - content: |
+                  sysstat:
+                    pkg:
+                      - installed
+                path: /srv/salt/sysstat.sls
             runcmd:
               - bash sed -i '/force_color_prompt=yes/s/^#//g' /home/ubuntu/.bashrc
               - bash /tmp/bootstrap-master.sh
@@ -283,6 +297,7 @@ resources:
               - /tmp/salt-init/salt-init.py MASTERNAME SLAVENAMEBASE NUMSLAVES
               - sudo -H -u spark bash -c "/usr/lib/spark/sbin/start-all.sh"
               - sudo -H -u ubuntu bash -c 'git clone https://github.com/cgeroux/big-data-examples.git $HOME/big-data-examples'
+              - sudo -H -u hdfs "cd ~; git clone https://github.com/cgeroux/python-cluster-iostat.git"
               - bash /tmp/finished.sh
           params:
             MASTERNAME: hs-master
