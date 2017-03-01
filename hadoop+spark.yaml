@@ -276,7 +276,7 @@ resources:
                 path: /tmp/finished.sh
                 permissions: "0755"
             runcmd:
-              - bash sed -i '/force_color_prompt=yes/s/^#//g' /home/ubuntu/.bashrc
+              - sed -i '/force_color_prompt=yes/s/^#//g' /home/ubuntu/.bashrc
               - bash /tmp/bootstrap-master.sh
               - bash /tmp/bootstrap-minion.sh
               - git clone https://github.com/cgeroux/hadoop-formula.git /srv/salt/formulas/hadoop-formula
@@ -291,7 +291,7 @@ resources:
               - sudo -H -u ubuntu bash -c 'git clone https://github.com/cgeroux/big-data-examples.git $HOME/big-data-examples'
               - ["cd","/tmp"]
               - ["git","clone","https://github.com/cgeroux/python-config-ganglia.git"]
-              - ["./python-config-ganglia/configure.py"]
+              - ["./python-config-ganglia/configure.py","--restart-time","60"]
               - bash /tmp/finished.sh
           params:
             MASTERNAME: hs-master
@@ -378,11 +378,11 @@ resources:
                     path: /tmp/finished.sh
                     permissions: "0755"
                 runcmd: 
-                 - bash sed -i '/force_color_prompt=yes/s/^#//g' /home/ubuntu/.bashrc
+                 - sed -i '/force_color_prompt=yes/s/^#//g' /home/ubuntu/.bashrc
                  - bash /tmp/bootstrap-minion.sh
                  - ["cd","/tmp"]
                  - ["git","clone","https://github.com/cgeroux/python-config-ganglia.git"]
-                 - ["./python-config-ganglia/configure.py","--master-ip","IPTOREPLACE"]
+                 - ["./python-config-ganglia/configure.py","--master-ip","IPTOREPLACE","--restart-time","60"]
                  - bash /tmp/finished.sh
               params:
                 IPTOREPLACE: { get_attr: [hs-master, first_address] }
