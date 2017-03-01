@@ -87,6 +87,12 @@ resources:
               - salt-master
               - salt-minion
               - make
+              - apache2
+              - ganglia-monitor
+              - ganglia-modules-linux
+              - ganglia-webfrontend
+              - rrdtool
+              - gmetad
             write_files:
               - content: |
                     roles:
@@ -283,6 +289,9 @@ resources:
               - /tmp/salt-init/salt-init.py MASTERNAME SLAVENAMEBASE NUMSLAVES
               - sudo -H -u spark bash -c "/usr/lib/spark/sbin/start-all.sh"
               - sudo -H -u ubuntu bash -c 'git clone https://github.com/cgeroux/big-data-examples.git $HOME/big-data-examples'
+              - ["cd","/tmp"]
+              - ["git","clone","https://github.com/cgeroux/python-config-ganglia.git"]
+              - ["./python-config-ganglia/configure.py"]
               - bash /tmp/finished.sh
           params:
             MASTERNAME: hs-master
@@ -337,9 +346,12 @@ resources:
                 #cloud-config
                 apt_sources:
                   - source: "ppa:saltstack/salt"
-                packages: 
+                packages:
+                  - git
                   - python-software-properties
                   - salt-minion
+                  - ganglia-monitor
+                  - ganglia-modules-linux
                 write_files: 
                   - content: |
                          roles:
@@ -368,6 +380,9 @@ resources:
                 runcmd: 
                  - bash sed -i '/force_color_prompt=yes/s/^#//g' /home/ubuntu/.bashrc
                  - bash /tmp/bootstrap-minion.sh
+                 - ["cd","/tmp"]
+                 - ["git","clone","https://github.com/cgeroux/python-config-ganglia.git"]
+                 - ["./python-config-ganglia/configure.py","--master-ip","IPTOREPLACE"]
                  - bash /tmp/finished.sh
               params:
                 IPTOREPLACE: { get_attr: [hs-master, first_address] }
@@ -404,5 +419,12 @@ outputs:
     value:
       str_replace:
         template: http://<hostip>:8088
+        params:
+          <hostip>: { get_attr: [ hs-master_floating_ip, floating_ip_address ] }
+  ganglia_url:
+    description: Link to ganglia cluster monitor page
+    value:
+      str_replace:
+        template: http://<hostip>/ganglia
         params:
           <hostip>: { get_attr: [ hs-master_floating_ip, floating_ip_address ] }
