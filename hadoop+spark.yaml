@@ -276,6 +276,9 @@ resources:
                 path: /tmp/finished.sh
                 permissions: "0755"
             runcmd:
+              - ["cd","/tmp"]
+              - ["git","clone","https://github.com/cgeroux/python-config-ganglia.git"]
+              - ["./python-config-ganglia/configure.py"]
               - sed -i '/force_color_prompt=yes/s/^#//g' /home/ubuntu/.bashrc
               - bash /tmp/bootstrap-master.sh
               - bash /tmp/bootstrap-minion.sh
@@ -289,9 +292,6 @@ resources:
               - /tmp/salt-init/salt-init.py MASTERNAME SLAVENAMEBASE NUMSLAVES
               - sudo -H -u spark bash -c "/usr/lib/spark/sbin/start-all.sh"
               - sudo -H -u ubuntu bash -c 'git clone https://github.com/cgeroux/big-data-examples.git $HOME/big-data-examples'
-              - ["cd","/tmp"]
-              - ["git","clone","https://github.com/cgeroux/python-config-ganglia.git"]
-              - ["./python-config-ganglia/configure.py","--restart-time","60"]
               - bash /tmp/finished.sh
           params:
             MASTERNAME: hs-master
@@ -382,7 +382,7 @@ resources:
                  - bash /tmp/bootstrap-minion.sh
                  - ["cd","/tmp"]
                  - ["git","clone","https://github.com/cgeroux/python-config-ganglia.git"]
-                 - ["./python-config-ganglia/configure.py","--master-ip","IPTOREPLACE","--restart-time","60"]
+                 - ["./python-config-ganglia/configure.py","--master-ip","IPTOREPLACE","--restart-time","120"]
                  - bash /tmp/finished.sh
               params:
                 IPTOREPLACE: { get_attr: [hs-master, first_address] }
