@@ -103,7 +103,7 @@ resources:
                 permissions: "0755"
               - content: |
                     #!/bin/bash
-                    sed -i 's/^#master.*$/master: 127.0.0.1/g' /etc/salt/minion
+                    sed -i 's/^#master:.*$/master: 127.0.0.1/g' /etc/salt/minion
                     sudo service salt-minion restart
                 path: /tmp/bootstrap-minion.sh
                 permissions: "0755"
