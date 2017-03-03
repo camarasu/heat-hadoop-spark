@@ -87,17 +87,12 @@ resources:
               - salt-master
               - salt-minion
               - make
-              - apache2
-              - ganglia-monitor
-              - ganglia-modules-linux
-              - ganglia-webfrontend
-              - rrdtool
-              - gmetad
             write_files:
               - content: |
                     roles:
                        - hadoop_master
                        - spark_target
+                       - ganglia_master
                     hdfs_data_disks:
                        - /mnt
                 path: /etc/salt/grains
@@ -120,6 +115,7 @@ resources:
                       - /srv/salt/formulas/hadoop-formula
                       - /srv/salt/formulas/hostsfile-formula
                       - /srv/salt/formulas/sun-java-formula
+                      - /srv/salt/formulas/ganglia-formula
                 path: /etc/salt/master.d/file_roots.conf
                 permissions: '0644'
               - content: |
@@ -135,6 +131,7 @@ resources:
                       - hostsfile.hostname
                       - sun-java
                       - sun-java.env
+                      - ganglia
                       - hadoop
                       - hadoop.hdfs
                       - hadoop.mapred
@@ -276,9 +273,6 @@ resources:
                 path: /tmp/finished.sh
                 permissions: "0755"
             runcmd:
-              - ["cd","/tmp"]
-              - ["git","clone","https://github.com/cgeroux/python-config-ganglia.git"]
-              - ["./python-config-ganglia/configure.py"]
               - sed -i '/force_color_prompt=yes/s/^#//g' /home/ubuntu/.bashrc
               - bash /tmp/bootstrap-master.sh
               - bash /tmp/bootstrap-minion.sh
@@ -286,6 +280,7 @@ resources:
               - git clone https://github.com/cgeroux/hostsfile-formula.git /srv/salt/formulas/hostsfile-formula
               - git clone https://github.com/cgeroux/sun-java-formula.git /srv/salt/formulas/sun-java-formula
               - git clone -b heat-compatible https://github.com/cgeroux/init-salt.git /tmp/salt-init
+              - git clone https://github.com/cgeroux/salt-formula-ganglia.git /srv/salt/formulas/ganglia-formula
               - sudo service salt-master restart
               - sudo service salt-minion restart
               - cd /srv/salt/formulas/hadoop-formula/hadoop/files;./generate_keypairs.sh
@@ -350,13 +345,12 @@ resources:
                   - git
                   - python-software-properties
                   - salt-minion
-                  - ganglia-monitor
-                  - ganglia-modules-linux
                 write_files: 
                   - content: |
                          roles:
                             - hadoop_slave
                             - spark_target
+                            - ganglia-slave
                          hdfs_data_disks:
                             - /mnt
                     path: /etc/salt/grains
@@ -380,9 +374,6 @@ resources:
                 runcmd: 
                  - sed -i '/force_color_prompt=yes/s/^#//g' /home/ubuntu/.bashrc
                  - bash /tmp/bootstrap-minion.sh
-                 - ["cd","/tmp"]
-                 - ["git","clone","https://github.com/cgeroux/python-config-ganglia.git"]
-                 - ["./python-config-ganglia/configure.py","--master-ip","IPTOREPLACE","--restart-time","120"]
                  - bash /tmp/finished.sh
               params:
                 IPTOREPLACE: { get_attr: [hs-master, first_address] }
