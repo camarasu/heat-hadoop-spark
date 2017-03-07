@@ -276,7 +276,7 @@ resources:
               - sed -i '/force_color_prompt=yes/s/^#//g' /home/ubuntu/.bashrc
               - bash /tmp/bootstrap-master.sh
               - bash /tmp/bootstrap-minion.sh
-              - git clone https://github.com/cgeroux/hadoop-formula.git /srv/salt/formulas/hadoop-formula
+              - git clone -b spark-2.0.1 https://github.com/cgeroux/hadoop-formula.git /srv/salt/formulas/hadoop-formula
               - git clone https://github.com/cgeroux/hostsfile-formula.git /srv/salt/formulas/hostsfile-formula
               - git clone https://github.com/cgeroux/sun-java-formula.git /srv/salt/formulas/sun-java-formula
               - git clone -b heat-compatible https://github.com/cgeroux/init-salt.git /tmp/salt-init
