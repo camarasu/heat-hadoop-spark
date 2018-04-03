@@ -58,6 +58,11 @@ parameters:
       - allowed_values:
         - VLAN3337
         - net04_ext
+  CIDR_rule:
+    type: string
+    description: CIDR rule to use for restricting access based on IP addresses. If in doubt use the address given at http://ipv4.icanhazip.com/ with a "/32" appended e.g. enter something like "216.123.12.43/32".
+    label: CIDR access rule
+    
 resources:
   hs-server-group:
     type: OS::Nova::ServerGroup
@@ -299,15 +304,15 @@ resources:
     properties:
       name: hs-security
       rules:
-        - remote_ip_prefix: 0.0.0.0/0
+        - remote_ip_prefix: {get_param: CIDR_rule}
           protocol: tcp
           port_range_min: 22
           port_range_max: 22
-        - remote_ip_prefix: 0.0.0.0/0
+        - remote_ip_prefix: {get_param: CIDR_rule}
           protocol: tcp
           port_range_min: 50070
           port_range_max: 50070
-        - remote_ip_prefix: 0.0.0.0/0
+        - remote_ip_prefix: {get_param: CIDR_rule}
           protocol: tcp
           port_range_min: 8088
           port_range_max: 8088
