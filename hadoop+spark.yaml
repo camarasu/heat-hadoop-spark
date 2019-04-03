@@ -51,12 +51,12 @@ parameters:
       - custom_constraint: neutron.network
   public_network:
     type: string
-    description: Network to use for obtaining public IP (VLAN3337 for west-cloud, net04_ext for east-cloud)
+    description: Network to use for obtaining public IP (Public-Network for Arbutus, net04_ext for east-cloud)
     label: Public Network
-    default: VLAN3337
+    default: Public-Network
     constraints:
       - allowed_values:
-        - VLAN3337
+        - Public-Network
         - net04_ext
   CIDR_rule:
     type: string
