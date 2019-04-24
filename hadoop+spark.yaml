@@ -147,7 +147,7 @@ resources:
                 path: /srv/pillar/top.sls
               - content: |
                   spark:
-                    version: 1.6.1-bin-hadoop2.6
+                    version: spark-2.4.1-bin-hadoop2.7
                     spark_target: "G@roles:hadoop_slave or G@roles:hadoop_master"
                     spark_master: "G@roles:hadoop_master"
                     spark_slave: "G@roles:hadoop_slave"
