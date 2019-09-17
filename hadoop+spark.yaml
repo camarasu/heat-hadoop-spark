@@ -14,28 +14,28 @@ parameters:
     description: ID or name of the image to use for the master node
     constraints:
       - custom_constraint: glance.image
-    default: ubuntu-server-14.04-amd64
+    default: ubuntu1604
   master-flavor:
     type: string
     label: Master Node Flavor
     description: Hardware flavor to be used for the master node
     constraints:
       - custom_constraint: nova.flavor
-    default: c1-7.5gb-30
+    default: m1.medium
   slave-image:
     type: string
     label: Slave Node Image
     description: ID or name of the image to use for the slave nodes
     constraints:
       - custom_constraint: glance.image
-    default: ubuntu-server-14.04-amd64
+    default: ubuntu1604
   slave-flavor:
     type: string
     label: Slave Node Flavor
     description: Hardware flavor to be used for the slave nodes
     constraints:
       - custom_constraint: nova.flavor
-    default: c1-7.5gb-30
+    default: m1.medium
   key:
     type: string
     label: Key-pair name
@@ -53,15 +53,18 @@ parameters:
     type: string
     description: Network to use for obtaining public IP (Public-Network for Arbutus, net04_ext for east-cloud)
     label: Public Network
-    default: Public-Network
+    default: ext-net
     constraints:
       - allowed_values:
-        - Public-Network
-        - net04_ext
+        - ext-net
   CIDR_rule:
     type: string
     description: CIDR rule to use for restricting access based on IP addresses. If in doubt use the address given at http://ipv4.icanhazip.com/ with a "/32" appended e.g. enter something like "216.123.12.43/32".
     label: CIDR access rule
+    constraints:
+      - allowed_values:
+        - 172.16.7.10/24
+        - 192.168.32.0/24
     
 resources:
   hs-server-group:
@@ -278,16 +281,19 @@ resources:
               - bash sed -i '/force_color_prompt=yes/s/^#//g' /home/ubuntu/.bashrc
               - bash /tmp/bootstrap-master.sh
               - bash /tmp/bootstrap-minion.sh
-              - git clone https://github.com/cgeroux/hadoop-formula.git /srv/salt/formulas/hadoop-formula
+              - git clone https://github.com/camarasu/salt-formula-hadoop /srv/salt/formulas/hadoop-formula
               - git clone https://github.com/cgeroux/hostsfile-formula.git /srv/salt/formulas/hostsfile-formula
-              - git clone https://github.com/cgeroux/sun-java-formula.git /srv/salt/formulas/sun-java-formula
+              - git clone https://github.com/camarasu/salt-formula-sun-java.git /srv/salt/formulas/sun-java-formula
               - git clone -b heat-compatible https://github.com/cgeroux/init-salt.git /tmp/salt-init
               - sudo service salt-master restart
               - sudo service salt-minion restart
               - cd /srv/salt/formulas/hadoop-formula/hadoop/files;./generate_keypairs.sh
               - /tmp/salt-init/salt-init.py MASTERNAME SLAVENAMEBASE NUMSLAVES
               - sudo -H -u spark bash -c "/usr/lib/spark/sbin/start-all.sh"
-              - sudo -H -u ubuntu bash -c 'git clone https://github.com/cgeroux/big-data-examples.git $HOME/big-data-examples'
+              - sudo -H -u hdfs bash -c "/usr/lib/hadoop-2.7.1/sbin/start-dfs.sh"
+              - sudo -H -u yarn bash -c "/usr/lib/hadoop-2.7.1/sbin/start-yarn.sh"
+              - sudo apt-get install firefox python-pip python-tk -y 
+              - sudo pip install numpy==1.16.0 matplotlib==2.2.3
               - bash /tmp/finished.sh
           params:
             MASTERNAME: hs-master
