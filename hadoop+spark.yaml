@@ -293,7 +293,7 @@ resources:
               - sudo -H -u hdfs bash -c "/usr/lib/hadoop-2.7.1/sbin/start-dfs.sh"
               - sudo -H -u yarn bash -c "/usr/lib/hadoop-2.7.1/sbin/start-yarn.sh"
               - sudo apt-get install firefox python-pip python-tk -y 
-              - sudo pip install numpy==1.16.0 matplotlib==2.2.3
+              - sudo pip install numpy==1.16.0 matplotlib==2.2.3 pandas==0.24
               - bash /tmp/finished.sh
           params:
             MASTERNAME: hs-master
